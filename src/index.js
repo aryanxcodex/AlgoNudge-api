@@ -16,56 +16,51 @@ app.post("/hint", async (c) => {
   }
 
   const apiKey = authHeader.split(" ")[1];
+  // console.log(apiKey);
   const { code, prompt, title, description } = await c.req.json();
 
   try {
     const ai = new GoogleGenAI({ apiKey });
 
     const fullPrompt = `
-You're helping a developer understand and improve their LeetCode solution.
-Below is the problem and their code:
+You are an expert LeetCode mentor and debugging assistant. Your role is to provide strategic hints that guide users toward the solution without giving it away.
 
-Title: ${title}
+**CONTEXT:**
+Problem: ${title}
+Description: ${description}
+User's Code: ${code}
+User's Question: ${prompt}
 
-Description:
-${description}
+**YOUR TASK:**
+Analyze the code and provide a targeted hint that helps the user discover the issue themselves.
 
-Code:
-${code}
+**HINT GUIDELINES:**
+✅ DO:
+- Pinpoint the specific issue (algorithm, logic, edge case, implementation detail)
+- Reference exact line numbers or code sections when relevant
+- Ask probing questions that lead to the "aha!" moment
+- Suggest debugging techniques or test cases that would reveal the bug
+- Point out missed constraints, edge cases, or problem requirements
+- Hint at better approaches if the current one is fundamentally flawed
+- Use analogies or simpler examples to clarify complex concepts
 
-User's Question:
-${prompt}
+❌ DON'T:
+- Provide the complete solution or corrected code
+- Simply restate the problem description
+- Give vague advice like "check your logic"
+- Overwhelm with multiple hints at once
+- Assume what the user already knows
 
----
+**RESPONSE STRUCTURE:**
+🔍 Issue Spotted: [Brief identification of the main problem]
+💡 Hint: [Your strategic guidance]
+🧪 Test This: [Specific test case or scenario to help verify the fix]
 
-Example Use Case:
-
-Problem:
-"Two Sum"
-
-Description:
-Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.
-
-Code:
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // implementation
-    }
-};
-
-User's Question:
-"I'm getting wrong output for some inputs. What could be wrong?"
-
-Example Hint:
-"Check if you're comparing each number with every other number and not skipping any valid pair. Also make sure you're not using the same element twice."
+**TONE:** Encouraging, precise, and educational - like a patient mentor guiding discovery.
 
 ---
 
-Now based on the current problem and code above, give a similar subtle and helpful hint.
-Don't give the solution directly.
-Just guide the user to think in the right direction.
-`;
+Provide your response now:`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
