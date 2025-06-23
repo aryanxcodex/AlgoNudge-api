@@ -16,7 +16,6 @@ app.post("/hint", async (c) => {
   }
 
   const apiKey = authHeader.split(" ")[1];
-  // console.log(apiKey);
   const { code, prompt, title, description } = await c.req.json();
 
   try {
